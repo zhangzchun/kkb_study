@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>开课吧购物车</title>
+    <style>
+        .active {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+<!-- 宿主文件 -->
+<div id="app">
+    <!-- <h2> -->
+    <!-- 特性、属性值绑定使用v-bind指令 -->
+    <h2 v-bind:title="title">
+        <!-- 插值文本 -->
+        {{title}}
+    </h2>
+
+    <!-- 用户输入 -->
+    <p>
+        <input type="text" v-model="course" v-on:keydown.enter="addCourse">
+        <button @click="addCourse">新增</button>
+    </p>
+    <!-- 列表渲染 && class style-->
+    <!--
+    <span> class </span>
+    <div v-for="c in courses" :key="c" :class="{active: selectedCourse === c}" @click="selectedCourse = c">
+        {{ c }}
+    </div>
+    <br>
+    -->
+    <span> style </span>
+    <!-- 条件渲染 -->
+    <p v-if="courses.length == 0">没有任何课程信息</p>
+    <div v-else class="course-list">
+        <div v-for="c in courses" :key="c" :style="{ backgroundColor: (selectedCourse === c ? '#ddd' : '')}" @click="selectedCourse = c">
+            {{ c }}
+        </div>
+    </div>
+
+
+</div>
+<script src="vue.js"></script>
+<script>
+    const app = new Vue({
+        el: '#app',
+        data: {
+            title: '开课吧购物车',
+            course: '',
+            selectedCourse:'',
+            courses: ['web全栈', 'web高级']
+        },
+        methods: {
+            addCourse() {
+                // 添加course到数组
+                this.courses.push(this.course);
+                // 清空course
+                this.course = '';
+            }
+        }
+    });
+</script>
+</body>
+</html>
