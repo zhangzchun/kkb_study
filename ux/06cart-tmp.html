@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>购物车render</title>
+    <style>
+        .active {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+<!-- 宿主文件 -->
+<div id="app">
+    <!-- <h2> -->
+    <!-- 特性、属性值绑定使用v-bind指令 -->
+    <h2 v-bind:title="title">
+        <!-- 插值文本 -->
+        {{title}}
+    </h2>
+    <!-- 用户输入 -->
+    <!--<p>
+        <input type="text" v-model="course" v-on:keydown.enter="addCourse">
+        <button @click="addCourse">新增</button>
+    </p>-->
+    <!-- 监听组件事件 -->
+    <course-add @add-course="addCourse"></course-add>
+
+    <!-- 条件渲染 -->
+    <course-list :courses="courses"></course-list>
+</div>
+<script src="vue.js"></script>
+<script>
+    // 组件注册
+    Vue.component('course-add', {
+        data() {
+            return {
+                course: '',
+                // 将course从父组件提取到course-add维护
+            }
+        },
+        template:  `<div>
+<input v-model="course" @keydown.enter="addCourse"/>
+<button v-on:click="addCourse">新增课程</button>
+</div> `,
+        methods: {
+            addCourse() {
+                // 发送自定义事件通知父组件
+                // 注意事件名称定义时不要有大写字母出现
+                this.$emit('add-course', this.course);
+                this.course = '';
+            }
+        },
+    });
+
+    // 注册course-list组件
+    Vue.component('course-list', {
+        data() {
+            return {
+                // 改状态属于course-list内部状态，因此作为数据
+                selectedCourse: '',
+            }
+        },
+        props: {
+            // 新增课程时也要访问courses，因此作为属性传递
+            courses: {
+                type: Array,
+                default: []
+            },
+        },
+        template:`<div>
+                        <p v-if="courses.length == 0">没有任何课程信息</p>
+                        <div v-else class="course-list">
+                            <div v-for="c in courses" :key="c" :style="{'background-color': (selectedCourse === c ? '#ddd' : '')}" @click="selectedCourse = c">
+                                {{ c }}
+                            </div>
+                        </div>
+                   </div>`,
+    });
+    const app = new Vue({
+        el: '#app',
+        data: {
+            title: '购物车',
+            course: '',
+            selectedCourse: '',
+            courses: ['web全栈', 'web高级'],
+            totalCount: ''
+        },
+        methods: {
+            /*
+            addCourse() {
+                // 添加course到数组
+                this.courses.push(this.course);
+                // 清空course
+                this.course = '';
+            }
+            */
+            // 回调函数接收事件参数
+            addCourse(course) {
+                this.courses.push(course);
+            }
+        },
+        computed: {
+            total() {
+                return this.courses.length + '门';
+            }
+        },
+        // 下面这种不能生效，因为初始化时不会触发
+        // watch: {
+        // courses(newValue, oldValue) {
+        // this.totalCount = newValue.length + '门'
+        // }
+        // },
+        watch: {
+            courses: {
+                immediate: true,
+                // deep: true,
+                handler(newValue, oldValue) {
+                    this.totalCount = newValue.length + '门';
+                }
+            }
+        },
+
+    });
+</script>
+</body>
+</html>

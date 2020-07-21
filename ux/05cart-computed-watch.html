@@ -18,8 +18,6 @@
         <!-- 插值文本 -->
         {{title}}
     </h2>
-    <!-- 条件渲染 -->
-    <p v-if="courses.length == 0">没有任何课程信息</p>
     <!-- 用户输入 -->
     <p>
         <input type="text" v-model="course" v-on:keydown.enter="addCourse">
@@ -34,11 +32,20 @@
     <br>
     -->
     <span> style </span>
+    <!-- 条件渲染 -->
+    <p v-if="courses.length == 0">没有任何课程信息</p>
     <div v-else class="course-list">
         <div v-for="c in courses" :key="c" :style="{'background-color': (selectedCourse === c ? '#ddd' : '')}" @click="selectedCourse = c">
             {{ c }}
         </div>
     </div>
+    <p>
+        <!-- 绑定表达式 -->
+        <!-- 课程总数：{{courses.length + '门'}} -->
+        <!-- 计算属性 --> <!-- 课程总数：{{total}} -->
+        <!-- 监听器 -->
+        课程总数：{{totalCount}}
+    </p>
 
 
 </div>
@@ -47,10 +54,11 @@
     const app = new Vue({
         el: '#app',
         data: {
-            title: '开课吧购物车',
+            title: '购物车',
             course: '',
             selectedCourse:'',
-            courses: ['web全栈', 'web高级']
+            courses: ['web全栈', 'web高级'],
+            totalCount:''
         },
         methods: {
             addCourse() {
@@ -59,7 +67,28 @@
                 // 清空course
                 this.course = '';
             }
-        }
+        },
+        computed: {
+            total() {
+                return this.courses.length + '门' ;
+            }
+        },
+        // 下面这种不能生效，因为初始化时不会触发
+        // watch: {
+        // courses(newValue, oldValue) {
+        // this.totalCount = newValue.length + '门'
+        // }
+        // },
+        watch: {
+            courses: {
+                immediate: true,
+                // deep: true,
+                handler(newValue, oldValue) {
+                    this.totalCount = newValue.length + '门';
+                }
+            }
+        },
+
     });
 </script>
 </body>

@@ -18,8 +18,6 @@
         <!-- 插值文本 -->
         {{title}}
     </h2>
-    <!-- 条件渲染 -->
-    <p v-if="courses.length == 0">没有任何课程信息</p>
     <!-- 用户输入 -->
     <p>
         <input type="text" v-model="course" v-on:keydown.enter="addCourse">
@@ -34,6 +32,8 @@
     <br>
     -->
     <span> style </span>
+    <!-- 条件渲染 -->
+    <p v-if="courses.length == 0">没有任何课程信息</p>
     <div v-else class="course-list">
         <div v-for="c in courses" :key="c" :style="{'background-color': (selectedCourse === c ? '#ddd' : '')}" @click="selectedCourse = c">
             {{ c }}
