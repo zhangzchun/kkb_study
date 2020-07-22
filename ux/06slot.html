@@ -2,10 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>tmp-v-model</title>
+    <title>slot</title>
     <style>
         .active {
             background-color: #ddd;
+        }
+
+        .message-box {
+            padding: 10px 20px;
+            background: #4fc08d;
+            border: 1px solid #42b983;
+        }
+
+        .message-box-close {
+            float: right;
         }
     </style>
 </head>
@@ -26,6 +36,8 @@
 
     <!-- 条件渲染 -->
     <course-list :courses="courses"></course-list>
+    <!-- 插槽实现内容分发 -->
+    <message :show.sync="show">新增课程成功！</message>
 </div>
 <script src="vue.js"></script>
 <script>
@@ -41,16 +53,25 @@
     }
 
     // 组件注册
+    // slot作为占位符
+    Vue.component('message', {
+        props: ['show'],
+        template: ` <div class="message-box" v-if="show">
+ <slot></slot>
+ <span class="message-box-close" @click="$emit('update:show', false)">X</span>
+    </div> `
+    });
+
     Vue.component('course-add', {
-       /*
-       data() {
-            return {
-                course: '',
-                // 将course从父组件提取到course-add维护
-            }
-        },
-        */
-       props:['value'],
+        /*
+        data() {
+             return {
+                 course: '',
+                 // 将course从父组件提取到course-add维护
+             }
+         },
+         */
+        props:['value'],
         methods: {
             addCourse() {
                 // 发送自定义事件通知父组件
@@ -88,7 +109,7 @@
         template:`<div>
 <p v-if="courses.length == 0">没有任何课程信息</p>
     <div v-else class="course-list">
-        <div v-for="c in courses" :key="c" :style="{'background-color': (selectedCourse === c ? '#ddd' : 'transparent')}" @click="selectedCourse = c">
+        <div v-for="c in courses" :key="c" :style="{'background-color': (selectedCourse === c ? '#ddd' : '')}" @click="selectedCourse = c">
             {{ c }}
         </div>
     </div>
@@ -101,7 +122,8 @@
             course: '',
             selectedCourse: '',
             courses: [],
-            totalCount: 0
+            totalCount: 0,
+            show: false, // 提示框状态
         },
         async created () {
             // 组件实例已创建，由于未挂载，dom不存在
@@ -109,21 +131,15 @@
             this.courses = courses;
         },
         methods: {
-            /*
-            addCourse() {
-                // 添加course到数组
-                this.courses.push(this.course);
-                // 清空course
-                this.course = '';
-            }
-            */
             // 回调函数接收事件参数
             /*addCourse(course) {
                 this.courses.push(course);
             }*/
             addCourse() {// 还原addCourse
-               this.courses.push(this.course);
-               this.course = '';
+                this.courses.push(this.course);
+                this.course = '';
+                // 提示新增信息
+                this.show = true;
             }
         },
         computed: {

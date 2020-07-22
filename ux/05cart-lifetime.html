@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>购物车render</title>
+    <title>lifetim</title>
     <style>
         .active {
             background-color: #ddd;
@@ -35,7 +35,7 @@
     <!-- 条件渲染 -->
     <p v-if="courses.length == 0">没有任何课程信息</p>
     <div v-else class="course-list">
-        <div v-for="c in courses" :key="c" :style="{'background-color': (selectedCourse === c ? '#ddd' : '')}" @click="selectedCourse = c">
+        <div v-for="c in courses" :key="c" :style="{'background-color': (selectedCourse === c ? '#ddd' : 'transparent')}" @click="selectedCourse = c">
             {{ c }}
         </div>
     </div>
