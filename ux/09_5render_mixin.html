@@ -27,17 +27,37 @@
             background: #f66;
             border: 1px solid #d63200;
         }
+
+        .icon {
+            width: 1em;
+            height: 1em;
+            vertical-align: -0.15em;
+            fill: currentColor;
+            overflow: hidden;
+        }
     </style>
+    <script src="https://at.alicdn.com/t/font_1281272_fepjp89tyz9.js"></script>
 </head>
 <body>
 <!-- 宿主文件 -->
 <div id="app">
     <!-- <h2> -->
     <!-- 特性、属性值绑定使用v-bind指令 -->
+    <!-- 使用render方法实现heading组件 -->
+    <heading level="1" :title="title" icon="gouwuche">
+        {{title}}
+    </heading>
     <h2 v-bind:title="title">
+        <svg class="icon">
+            <use xlink:href="#icon-gouwuche"></use>
+        </svg>
         <!-- 插值文本 -->
         {{title}}
     </h2>
+    <!-- toolbar -->
+    <div class="toolbar" v-permission="'admin'">
+        <button @click="$bus.$emit('message-close')">清空提示框</button>
+    </div>
     <!-- 用户输入 -->
     <!-- 自定义组件支持v-model需要实现内部input的:value和@input -->
     <course-add v-model="course" @add-course="addCourse"></course-add>
@@ -85,15 +105,69 @@
     // 总线
     Vue.prototype.$bus = new Vue();
 
+    Vue.component('heading', {
+        props: {
+            level: {
+                type: String,
+                required: true
+            },
+            title: {
+                type: String,
+                default: ''
+            },
+        },
+        render(h) {
+            // snabdom
+            // 子节点数组
+            let children = []
+
+            // icon属性处理逻辑
+            if (this.icon) {
+                // <svg class="icon"><use xlink:href="#icon-cart"/></svg>
+                children.push(h(
+                    'svg',
+                    { class: 'icon' },
+                    [h('use', { attrs: { 'xlink:href': '#icon-' + this.icon } })]
+                ))
+
+            }
+
+            children = children.concat(this.$slots.default);
+
+            const vnode = h(
+                'h' + this.level, // 参数1：tagname
+                { attrs: { title: this.title } }, // 参数2：{。。。}
+                // this.$slots.default // 参数3：子节点VNode数组
+                children
+            )
+            console.log(vnode);
+            return vnode
+        }
+    });
+
+    // 定义一个混入对象
+    var myMixin = {
+        created: function () {
+            // this 表示组件实例
+            this.hello()
+        },
+        methods: {
+            hello: function () {
+                console.log('hello from mixin!')
+            }
+        }
+    };
+
     // 组件注册
     // slot作为占位符
     Vue.component('message', {
         // props: ['show'],
         data() {
-          return {
-              show:false,
-          }
+            return {
+                show:false,
+            }
         },
+        mixins: [myMixin],
         template: ` <div class="message-box" v-if="show">
                         <strong><slot name="title"></slot></strong>
                         <slot></slot>
@@ -108,7 +182,8 @@
             toggle () {
                 this.show = !this.show;
             }
-        }
+        },
+
     });
 
     Vue.component('course-add', {
@@ -137,11 +212,32 @@
             this.$refs.inp.focus()
         },
         template:  `<div>
-                        <input :value="value" @input="onInput" @keydown.enter="addCourse" ref="inp"/>
+                        <input :value="value" @input="onInput" @keydown.enter="addCourse" ref="inp" v-focus />
                         <button v-on:click="addCourse">新增课程</button>
                     </div> `,
 
     });
+    // 实现自定义指令
+    Vue.directive('focus', {
+        inserted(el, binding) {
+            el.focus()
+        }
+    });
+
+    // 模拟用户角色
+    const role = 'user'
+    // 注释报错
+
+    // v-permission="'admin'"
+    Vue.directive('permission', {
+        inserted(el, binding) {
+            console.log(binding);
+            // 若指定用户角色和当前用户角色不匹配则删除当前指令绑定的元素
+            if (role !== binding.value) {
+                el.parentElement.removeChild(el)
+            }
+        }
+    })
 
     // 注册course-list组件
     Vue.component('course-list', {
