@@ -39,7 +39,7 @@
     <!-- 插槽实现内容分发 -->
     <message :show.sync="show">
         <!-- 具名插槽 v-slot 命名为 title  语法糖-->
-        <template v-slot:title="slotProps">{{slotProps.title}}</template>
+        <template v-slot:title>恭喜</template>
         <!-- 默认插槽 -->
         <!--<template v-slot:default >新增课程成功！</template>-->
         <template>新增课程成功！</template>
@@ -63,7 +63,7 @@
     Vue.component('message', {
         props: ['show'],
         template: ` <div class="message-box" v-if="show">
-                        <strong><slot name="title" title="来自message的标题"></slot></strong>
+                        <strong><slot name="title"></slot></strong>
                         <slot></slot>
                         <span class="message-box-close" @click="$emit('update:show', false)">X</span>
                      </div> `

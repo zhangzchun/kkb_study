@@ -17,6 +17,16 @@
         .message-box-close {
             float: right;
         }
+
+        .success {
+            background: #4fc08d;
+            border: 1px solid #42b983;
+        }
+
+        .warning {
+            background: #f66;
+            border: 1px solid #d63200;
+        }
     </style>
 </head>
 <body>
@@ -28,21 +38,40 @@
         <!-- 插值文本 -->
         {{title}}
     </h2>
+    <!-- toolbar -->
+    <div class="toolbar">
+        <button @click="$bus.$emit('message-close')">清空提示框</button>
+    </div>
+
     <!-- 用户输入 -->
     <!-- 自定义组件支持v-model需要实现内部input的:value和@input -->
     <course-add v-model="course" @add-course="addCourse"></course-add>
     <!--<course-add :value="course" @input="onInput" @add-course="addCourse"></course-add>-->
     <!--<course-add :value="course" @input="course = $event" @add-course="addCourse"></course-add>-->
 
+    <!-- 批量更新价格 -->
+    <p>
+        <input type="text" v-model.number="price">
+        <button @click="batchUpdate">批量更新价格</button>
+    </p>
+
     <!-- 条件渲染 -->
     <course-list :courses="courses"></course-list>
     <!-- 插槽实现内容分发 -->
-    <message :show.sync="show">
+    <!--<message :show.sync="show">-->
+    <message :show.sync="show" class="success">
         <!-- 具名插槽 v-slot 命名为 title  语法糖-->
-        <template v-slot:title="slotProps">{{slotProps.title}}</template>
+        <template v-slot:title>恭喜</template>
         <!-- 默认插槽 -->
         <!--<template v-slot:default >新增课程成功！</template>-->
         <template>新增课程成功！</template>
+    </message>
+    <message :show.sync="showWarn" class="warning">
+        <!-- 具名插槽 v-slot 命名为 title  语法糖-->
+        <template v-slot:title>警告</template>
+        <!-- 默认插槽 -->
+        <!--<template v-slot:default >新增课程成功！</template>-->
+        <template>请输入课程名称</template>
     </message>
 </div>
 <script src="vue.js"></script>
@@ -53,20 +82,28 @@
         return new Promise(resolve => {
             setTimeout(() => {
                 // resolve([{ name: 'web全栈' }, { name: 'web高级' }])
-                resolve(['web全栈', 'web高级'])
+                resolve([{ name: 'web全栈' }, { name: 'web高级' }])
             }, 2000);
         })
     }
+
+    // 总线
+    Vue.prototype.$bus = new Vue();
 
     // 组件注册
     // slot作为占位符
     Vue.component('message', {
         props: ['show'],
         template: ` <div class="message-box" v-if="show">
-                        <strong><slot name="title" title="来自message的标题"></slot></strong>
+                        <strong><slot name="title"></slot></strong>
                         <slot></slot>
                         <span class="message-box-close" @click="$emit('update:show', false)">X</span>
-                     </div> `
+                     </div> `,
+        mounted() {
+            this.$bus.$on('message-close', () => {
+                this.$emit('update:show', false);
+            })
+        },
     });
 
     Vue.component('course-add', {
@@ -116,8 +153,8 @@
         template:`<div>
 <p v-if="courses.length == 0">没有任何课程信息</p>
     <div v-else class="course-list">
-        <div v-for="c in courses" :key="c" :style="{'background-color': (selectedCourse === c ? '#ddd' : '')}" @click="selectedCourse = c">
-            {{ c }}
+        <div v-for="c in courses" :key="c.name" :style="{'background-color': (selectedCourse === c ? '#ddd' : '')}" @click="selectedCourse = c">
+            {{ c.name }} -- ￥ {{c.price}}
         </div>
     </div>
     </div>`,
@@ -131,11 +168,20 @@
             courses: [],
             totalCount: 0,
             show: false, // 提示框状态
+            showWarn: false, // 提示框状态
+            foo: {
+                foo:'foo',
+                bar:'bar'
+            },
+            price:0
         },
         async created () {
             // 组件实例已创建，由于未挂载，dom不存在
             const courses = await getCourses();
             this.courses = courses;
+
+            // 批量更新商品价格
+            this.batchUpdate()
         },
         methods: {
             // 回调函数接收事件参数
@@ -143,10 +189,25 @@
                 this.courses.push(course);
             }*/
             addCourse() {// 还原addCourse
-                this.courses.push(this.course);
-                this.course = '';
-                // 提示新增信息
-                this.show = true;
+                if (this.course) {
+                    this.courses.push({name:this.course});
+                    this.course = '';
+                    // 提示新增信息
+                    this.show = true;
+                } else {
+                    this.showWarn = true;
+                }
+
+            },
+            // 批量显示价格
+            batchUpdate() {
+                this.courses.forEach(c => {
+                    // c.price = 0
+                    // c.price = this.price
+                    // Vue.set(c, 'price', this.price)
+                    app.$set(c, 'price', this.price)
+                    // this.$set(c, 'price', this.price)
+                })
             }
         },
         computed: {

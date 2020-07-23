@@ -37,6 +37,8 @@
     <!-- 条件渲染 -->
     <course-list :courses="courses"></course-list>
     <!-- 插槽实现内容分发 -->
+    <!--<message :show="show" @close='show = $event()'>新增课程成功！</message>-->
+    <!-- 2.4 + .sync  @update:show=''-->
     <message :show.sync="show">新增课程成功！</message>
 </div>
 <script src="vue.js"></script>
@@ -56,6 +58,10 @@
     // slot作为占位符
     Vue.component('message', {
         props: ['show'],
+        /*template: ` <div class="message-box" v-if="show">
+ <slot></slot>
+ <span class="message-box-close" @click="$emit('close', false)">X</span>
+    </div> `,*/
         template: ` <div class="message-box" v-if="show">
  <slot></slot>
  <span class="message-box-close" @click="$emit('update:show', false)">X</span>
