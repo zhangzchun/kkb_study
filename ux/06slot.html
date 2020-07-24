@@ -38,7 +38,7 @@
     <course-list :courses="courses"></course-list>
     <!-- 插槽实现内容分发 -->
     <!--<message :show="show" @close='show = $event()'>新增课程成功！</message>-->
-    <!-- 2.4 + .sync  @update:show=''-->
+    <!-- 2.4 + .sync === @update:show=''-->
     <message :show.sync="show">新增课程成功！</message>
 </div>
 <script src="vue.js"></script>
@@ -48,7 +48,6 @@
     function getCourses() {
         return new Promise(resolve => {
             setTimeout(() => {
-                // resolve([{ name: 'web全栈' }, { name: 'web高级' }])
                 resolve(['web全栈', 'web高级'])
             }, 2000);
         })

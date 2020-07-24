@@ -12,14 +12,13 @@
 <body>
 <!-- 宿主文件 -->
 <div id="app">
-    <!-- <h2> -->
     <!-- 特性、属性值绑定使用v-bind指令 -->
     <h2 v-bind:title="title">
         <!-- 插值文本 -->
         {{title}}
     </h2>
     <!-- 用户输入 -->
-    <!-- 自定义组件支持v-model需要实现内部input的:value和@input -->
+    <!-- 自定义组件支持 v-model 需要实现内部 input的:value和@input -->
     <course-add v-model="course" @add-course="addCourse"></course-add>
     <!--<course-add :value="course" @input="onInput" @add-course="addCourse"></course-add>-->
     <!--<course-add :value="course" @input="course = $event" @add-course="addCourse"></course-add>-->
@@ -34,7 +33,6 @@
     function getCourses() {
         return new Promise(resolve => {
             setTimeout(() => {
-                // resolve([{ name: 'web全栈' }, { name: 'web高级' }])
                 resolve(['web全栈', 'web高级'])
             }, 2000);
         })

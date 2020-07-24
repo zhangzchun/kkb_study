@@ -24,7 +24,7 @@
         el: '#app',
         data() {
             return {
-                title: '开课吧购物车',
+                title: '购物车',
                 course: '',
                 selectedCourse: '',
                 courses: ['web全栈', 'web高级']
@@ -33,7 +33,7 @@
         methods: {
             addCourse() {
                 // 1.添加course到数组
-                this.courses.push(this.course)
+                this.courses.push(this.course);
                 // 2.清空course
                 this.course = ''
             }

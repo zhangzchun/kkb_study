@@ -12,7 +12,6 @@
 <body>
 <!-- 宿主文件 -->
 <div id="app">
-    <!-- <h2> -->
     <!-- 特性、属性值绑定使用v-bind指令 -->
     <h2 v-bind:title="title">
         <!-- 插值文本 -->
@@ -23,15 +22,6 @@
         <input type="text" v-model="course" v-on:keydown.enter="addCourse">
         <button @click="addCourse">新增</button>
     </p>
-    <!-- 列表渲染 && class style-->
-    <!--
-    <span> class </span>
-    <div v-for="c in courses" :key="c" :class="{active: selectedCourse === c}" @click="selectedCourse = c">
-        {{ c }}
-    </div>
-    <br>
-    -->
-    <span> style </span>
     <!-- 条件渲染 -->
     <p v-if="courses.length == 0">没有任何课程信息</p>
     <div v-else class="course-list">
@@ -80,9 +70,9 @@
             }
         },
         template:  `<div>
-<input v-model="course" @keydown.enter="addCourse"/>
-<button v-on:click="addCourse">新增课程</button>
-</div> `,
+                        <input v-model="course" @keydown.enter="addCourse"/>
+                        <button v-on:click="addCourse">新增课程</button>
+                    </div> `,
 
     });
 

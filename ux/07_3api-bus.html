@@ -46,8 +46,6 @@
     <!-- 用户输入 -->
     <!-- 自定义组件支持v-model需要实现内部input的:value和@input -->
     <course-add v-model="course" @add-course="addCourse"></course-add>
-    <!--<course-add :value="course" @input="onInput" @add-course="addCourse"></course-add>-->
-    <!--<course-add :value="course" @input="course = $event" @add-course="addCourse"></course-add>-->
 
     <!-- 批量更新价格 -->
     <p>
@@ -58,19 +56,12 @@
     <!-- 条件渲染 -->
     <course-list :courses="courses"></course-list>
     <!-- 插槽实现内容分发 -->
-    <!--<message :show.sync="show">-->
     <message :show.sync="show" class="success">
-        <!-- 具名插槽 v-slot 命名为 title  语法糖-->
         <template v-slot:title>恭喜</template>
-        <!-- 默认插槽 -->
-        <!--<template v-slot:default >新增课程成功！</template>-->
         <template>新增课程成功！</template>
     </message>
     <message :show.sync="showWarn" class="warning">
-        <!-- 具名插槽 v-slot 命名为 title  语法糖-->
         <template v-slot:title>警告</template>
-        <!-- 默认插槽 -->
-        <!--<template v-slot:default >新增课程成功！</template>-->
         <template>请输入课程名称</template>
     </message>
 </div>
@@ -154,7 +145,7 @@
 <p v-if="courses.length == 0">没有任何课程信息</p>
     <div v-else class="course-list">
         <div v-for="c in courses" :key="c.name" :style="{'background-color': (selectedCourse === c ? '#ddd' : '')}" @click="selectedCourse = c">
-            {{ c.name }} -- ￥ {{c.price}}
+            {{ c.name }} -- ￥{{c.price}}
         </div>
     </div>
     </div>`,

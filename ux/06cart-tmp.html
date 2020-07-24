@@ -12,7 +12,6 @@
 <body>
 <!-- 宿主文件 -->
 <div id="app">
-    <!-- <h2> -->
     <!-- 特性、属性值绑定使用v-bind指令 -->
     <h2 v-bind:title="title">
         <!-- 插值文本 -->
@@ -48,9 +47,9 @@
             }
         },
         template:  `<div>
-<input v-model="course" @keydown.enter="addCourse"/>
-<button v-on:click="addCourse">新增课程</button>
-</div> `,
+                        <input v-model="course" @keydown.enter="addCourse"/>
+                        <button v-on:click="addCourse">新增课程</button>
+                    </div> `,
 
     });
 

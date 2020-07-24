@@ -22,7 +22,6 @@
 <body>
 <!-- 宿主文件 -->
 <div id="app">
-    <!-- <h2> -->
     <!-- 特性、属性值绑定使用v-bind指令 -->
     <h2 v-bind:title="title">
         <!-- 插值文本 -->
@@ -42,12 +41,8 @@
 
     <!-- 条件渲染 -->
     <course-list :courses="courses"></course-list>
-    <!-- 插槽实现内容分发 -->
     <message :show.sync="show">
-        <!-- 具名插槽 v-slot 命名为 title  语法糖-->
         <template v-slot:title>恭喜</template>
-        <!-- 默认插槽 -->
-        <!--<template v-slot:default >新增课程成功！</template>-->
         <template>新增课程成功！</template>
     </message>
 </div>
