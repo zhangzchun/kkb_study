@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>lifetime</title>
+    <style>
+        .active {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <h2 :title="title">
+        {{title}}
+    </h2>
+
+    <div>
+        <input type="text" v-model="course" @keydown.enter="addCourse">
+        <button @click="addCourse">新增</button>
+    </div>
+
+    <!-- 条件渲染 -->
+    <p v-if="courses.length == 0">没有课程信息</p>
+    <div v-else class="course-list">
+        <div v-for="c in courses" :key="c" :style="{'background-color': (selectedCourse === c ? '#ddd' : 'transparent')}"
+             @click = "selectedCourse = c">
+            {{ c }}
+        </div>
+    </div>
+    <p>
+        <!--{{ courses.length + '门'}}-->
+        <!-- 计算属性 -->
+        {{ total }}
+        <!-- 监听器 -->
+        {{ totalCount }}
+    </p>
+
+</div>
+
+<script src="vue.js"></script>
+<script>
+    // 模拟异步数据调用
+    function getCourses() {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                resolve(['web全栈', 'web高级'])
+            }, 2000);
+        })
+    }
+    const app = new Vue({
+        el: '#app',
+        data:{
+            title:'购物车',
+            course:'',
+            courses:[],
+            selectedCourse:'',
+
+        },
+        async created () {
+            const courses = await getCourses();
+            this.courses = courses;
+        },
+        methods :{
+            addCourse () {
+                this.courses.push(this.course);
+                this.course='';
+            },
+        },
+        computed: {
+            total () {
+                return this.courses.length +'门';
+            }
+        },
+        watch: {
+            courses: {
+                immediate: true,
+                handler(newValue, oldValue) {
+                    this.totalCount = newValue.length +'门';
+                }
+            }
+        }
+    })
+</script>
+</body>
+</html>
