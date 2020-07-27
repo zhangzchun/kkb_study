@@ -18,17 +18,14 @@
         {{title}}
     </h2>
     <!-- 用户输入 -->
-    <p>
+    <!--<p>
         <input type="text" v-model="course" v-on:keydown.enter="addCourse">
         <button @click="addCourse">新增</button>
-    </p>
+    </p>-->
+    <!-- 监听组件事件 -->
+    <course-add @add-course="addCourse"></course-add>
+
     <!-- 条件渲染 -->
-    <!--<p v-if="courses.length == 0">没有任何课程信息</p>
-    <div v-else class="course-list">
-        <div v-for="c in courses" :key="c" :style="{'background-color': (selectedCourse === c ? '#ddd' : '')}" @click="selectedCourse = c">
-            {{ c }}
-        </div>
-    </div>-->
     <course-list :courses = "courses"></course-list>
     <p>
         <!-- 绑定表达式 -->
@@ -51,6 +48,28 @@
             }, 2000);
         })
     }
+
+    //
+    Vue.component('course-add', {
+        data() {
+            return {
+                course: '',
+                // 将course从父组件提取到course-add维护
+            }
+        },
+        methods: {
+            addCourse() {
+                // 发送自定义事件通知父组件，派发事件通知父组件新增课程
+                // 注意事件名称定义时不要有大写字母出现
+                this.$emit('add-course', this.course);
+                this.course = '';
+            }
+        },
+        template:  `<div>
+                        <input v-model="course" @keydown.enter="addCourse"/>
+                        <button v-on:click="addCourse">新增课程</button>
+                    </div> `,
+    });
 
     // 注册course-list组件
     Vue.component('course-list', {
@@ -91,8 +110,6 @@
         el: '#app',
         data: {
             title: '购物车',
-            course: '',
-            selectedCourse:'',
             courses: [],
             totalCount:''
         },
@@ -103,11 +120,18 @@
         },
 
         methods: {
+            /*
             addCourse() {
                 // 添加course到数组
                 this.courses.push(this.course);
                 // 清空course
                 this.course = '';
+            }
+            */
+
+            // 回调函数接收事件参数
+            addCourse(course) {
+                this.courses.push(course);
             }
         },
         computed: {
