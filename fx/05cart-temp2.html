@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>fx temp 2</title>
+
+    <style>
+        .active {
+            background-color: #ddd;
+        }
+    </style>
+
+</head>
+<body>
+
+<div id="app">
+    <h2 v-bind:title="title">
+        {{title}}
+    </h2>
+
+    <course-add @add-course = "addCourse"></course-add>
+
+    <!-- 条件渲染 -->
+    <course-list :courses = courses></course-list>
+
+    <p>
+        <!-- 绑定表达式 -->
+        <!-- 课程总数：{{courses.length + '门'}} -->
+        <!-- 计算属性 --> <!-- 课程总数：{{total}} -->
+        <!-- 监听器 -->
+        课程总数：{{totalCount}}
+    </p>
+
+</div>
+
+<script src="vue.js"></script>
+<script>
+
+    function getCourses() {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                // resolve([{ name: 'web全栈' }, { name: 'web高级' }])
+                resolve(['web全栈', 'web高级'])
+            },2000)
+        })
+    }
+
+    Vue.component('course-add', {
+        data() {
+            return {
+                course:'',
+            }
+        },
+        methods: {
+            emitCourse () {
+                this.$emit('add-course',this.course);
+                this.course = ''
+            }
+
+        },
+        template:`<div>
+                        <input v-model="course" @keydown.enter="emitCourse"/>
+                        <button v-on:click="emitCourse">新增课程</button>
+                    </div> `,
+    });
+
+    Vue.component('course-list', {
+        data () {
+            return {
+                selectedCourse:'',
+            }
+        },
+        props:{
+            courses: {
+                type:Array,
+                default:[]
+            }
+        },
+        template:`<div>
+<p v-if="courses.length == 0">没有课程信息</p>
+    <div v-else class="course-list">
+        <div v-for="c in courses" :key="c" :style="{'background-color': (selectedCourse === c ? '#ddd' : 'transparent')}"
+             @click = "selectedCourse = c">
+            {{ c }}
+        </div>
+    </div>
+                  </div>`
+    });
+
+
+    const app = new Vue({
+        el:'#app',
+        data:{
+            title:"购物车",
+            courses:[],
+            totalCount:0
+        },
+        async created () {
+            const courses = await getCourses();
+            this.courses = courses;
+        },
+        methods : {
+            /*
+            addCourse() {
+                // 添加course到数组
+                this.courses.push(this.course);
+                // 清空course
+                this.course = '';
+            }
+            */
+            // 回调函数接收事件参数
+            addCourse(course) {
+                this.courses.push(course);
+            }
+        },
+        computed: {
+            total () {
+                // 计算属性有缓存
+                return this.courses.length + '门'
+            }
+        },
+        watch : {
+            courses: {
+                immediate: true,
+                // deep: true,
+                handler(newValue, oldValue) {
+                    this.totalCount = newValue.length + '门';
+                }
+            }
+        }
+    })
+</script>
+</body>
+</html>

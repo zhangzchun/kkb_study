@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>lifetime</title>
+    <title>fx temp</title>
     <style>
         .active {
             background-color: #ddd;
@@ -21,13 +21,7 @@
     </div>
 
     <!-- 条件渲染 -->
-    <p v-if="courses.length == 0">没有课程信息</p>
-    <div v-else class="course-list">
-        <div v-for="c in courses" :key="c" :style="{'background-color': (selectedCourse === c ? '#ddd' : 'transparent')}"
-             @click = "selectedCourse = c">
-            {{ c }}
-        </div>
-    </div>
+    <course-list :courses = "courses"></course-list>
     <p>
         <!--{{ courses.length + '门'}}-->
         <!-- 计算属性 -->
@@ -48,13 +42,35 @@
             }, 2000);
         })
     }
+
+    Vue.component('course-list', {
+        data () {
+          return {
+              selectedCourse:""
+          }
+        },
+        props:{
+            courses:{
+                type:Array,
+                default:[]
+            }
+        },
+        template:`<div>
+<p v-if="courses.length == 0">没有课程信息</p>
+    <div v-else class="course-list">
+        <div v-for="c in courses" :key="c" :style="{'background-color': (selectedCourse === c ? '#ddd' : 'transparent')}"
+             @click = "selectedCourse = c">
+            {{ c }}
+        </div>
+    </div>
+                  </div>`
+    });
     const app = new Vue({
         el: '#app',
         data:{
             title:'购物车',
             course:'',
             courses:[],
-            selectedCourse:'',
         },
         async created () {
             const courses = await getCourses();
