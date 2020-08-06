@@ -7,7 +7,9 @@
 <body>
 
 <div id="app">
+    <h2 :title = "title"> {{title}} </h2>
 
+    <course-add v-model="course" @add-course="addCourse"></course-add>
     <!-- 条件渲染 -->
     <course-list :courses="courses"></course-list>
 
@@ -23,6 +25,7 @@
 
 <script src="vue.js"></script>
 <script>
+
     function getCourses() {
         return new Promise(resolve => {
             setTimeout(() => {
@@ -31,8 +34,42 @@
         })
     }
 
-    Vue.component('course-list',{
+    Vue.component('course-add',{
+       props:['value'],
+        template:`<div>
+<input type="text" :value="value" @input = 'onInput' @keydown.enter="addCourse" />
+<button @click="addCourse">添加课程</button>
+</div>`,
+       methods:{
+           addCourse() {
+               this.$emit('add-course')
+           },
+           onInput (e) {
+               this.$emit('input', e.target.value);
+           }
+       }
+    });
 
+    Vue.component('course-list',{
+        data () {
+            return {
+                selectedCourse:''
+            }
+        },
+        props: {
+            courses:{
+                type:Array,
+                default:[]
+            }
+        },
+        template:`<div>
+<p v-if="courses.length == 0">没有课程信息</p>
+<div v-else class="course-list">
+<div v-for="c in courses" :key="c" :style="{'background-color': (selectedCourse === c ? '#ddd' : 'transparent')}" @click="selectedCourse = c">
+{{ c }}
+</div>
+</div>
+</div>`
     });
 
     const app = new Vue({
@@ -50,8 +87,12 @@
         },
         methods :{
             // 回调函数接收事件参数
-            addCourse(course) {
+            /*addCourse(course) {
                 this.courses.push(course);
+            }*/
+            addCourse() {// 还原addCourse
+                this.courses.push(this.course);
+                this.course = '';
             }
         },
         computed :{
@@ -66,7 +107,7 @@
                 handler(newValue, oldValue) {
                     this.totalCount = newValue.length + '门';
                 }
-            }
+            },
         }
     })
 </script>
