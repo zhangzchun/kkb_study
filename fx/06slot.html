@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>temp slot</title>
+    <style>
+        .active {
+            background-color: #ddd;
+        }
+
+        .message-box {
+            padding: 10px 20px;
+            background: #4fc08d;
+            border: 1px solid #42b983;
+        }
+
+        .message-box-close {
+            float: right;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <message :show = 'show' @close='show = $event()'>新增课程成功！</message>
+    <!--<message :show.sync = 'show'></message>-->
+    <h2 :title = "title"> {{title}} </h2>
+
+    <course-add v-model="course" @add-course="addCourse"></course-add>
+    <!-- 条件渲染 -->
+    <course-list :courses="courses"></course-list>
+
+    <p>
+        <!-- 绑定表达式 -->
+        <!-- 课程总数：{{courses.length + '门'}} -->
+        <!-- 计算属性 --> <!-- 课程总数：{{total}} -->
+        <!-- 监听器 -->
+        课程总数：{{totalCount}}
+    </p>
+
+
+</div>
+
+<script src="vue.js"></script>
+<script>
+
+    function getCourses() {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                resolve(['web全栈', 'web高级'])
+            }, 2000);
+        })
+    }
+
+    Vue.component('message',{
+       props:['show'] ,
+       /*template: ` <div class="message-box" v-if="show">
+ <slot></slot>
+ <span class="message-box-close" @click="$emit('close', false)">X</span>
+    </div> `,*/
+       template:`<div>
+<slot></slot>
+<span class="message-box-close" @click = "$emit('update:show', false)">X</span>
+</div>`,
+    });
+
+    Vue.component('course-add',{
+       props:['value'],
+        template:`<div>
+<input type="text" :value="value" @input = 'onInput' @keydown.enter="addCourse" />
+<button @click="addCourse">添加课程</button>
+</div>`,
+       methods:{
+           addCourse() {
+               this.$emit('add-course')
+           },
+           onInput (e) {
+               this.$emit('input', e.target.value);
+           }
+       }
+    });
+
+    Vue.component('course-list',{
+        data () {
+            return {
+                selectedCourse:''
+            }
+        },
+        props: {
+            courses:{
+                type:Array,
+                default:[]
+            }
+        },
+        template:`<div>
+<p v-if="courses.length == 0">没有课程信息</p>
+<div v-else class="course-list">
+<div v-for="c in courses" :key="c" :style="{'background-color': (selectedCourse === c ? '#ddd' : 'transparent')}" @click="selectedCourse = c">
+{{ c }}
+</div>
+</div>
+</div>`
+    });
+
+    const app = new Vue({
+        el:'#app',
+        data () {
+            return {
+                title:'购物车',
+                course: '',
+                courses:[],
+                totalCount:0,
+                show:false // 提示框状态
+            }
+        },
+        async created () {
+            const courses = await getCourses();
+            this.courses = courses
+        },
+        methods :{
+            // 回调函数接收事件参数
+            /*addCourse(course) {
+                this.courses.push(course);
+            }*/
+            addCourse() {// 还原addCourse
+                this.courses.push(this.course);
+                this.course = '';
+
+                this.show = true;
+            }
+        },
+        computed :{
+            total() {
+                return this.courses.length + '门';
+            }
+        },
+        watch: {
+            courses: {
+                immediate: true,
+                // deep: true,
+                handler(newValue, oldValue) {
+                    this.totalCount = newValue.length + '门';
+                }
+            },
+        }
+    })
+</script>
+</body>
+</html>
