@@ -19,6 +19,8 @@
         <input type="text" v-model="course" @keydown.enter="addCourse"/>
         <button @click="addCourse"> 新增申请 </button>
     </div>
+
+    <!-- 条件渲染 -->
     <p v-if="courses.length == 0">
         没有课程信息
     </p>

@@ -26,7 +26,8 @@
     <p>
         <!-- 绑定表达式 -->
         <!-- 课程总数：{{courses.length + '门'}} -->
-        <!-- 计算属性 --> <!-- 课程总数：{{total}} -->
+        <!-- 计算属性 -->
+        <!-- 课程总数：{{total}} -->
         <!-- 监听器 -->
         课程总数：{{totalCount}}
     </p>
@@ -39,7 +40,6 @@
     function getCourses() {
         return new Promise(resolve => {
             setTimeout(() => {
-                // resolve([{ name: 'web全栈' }, { name: 'web高级' }])
                 resolve(['web全栈', 'web高级'])
             },2000)
         })
@@ -48,11 +48,14 @@
     Vue.component('course-add', {
         data() {
             return {
+                // 将course从父组件提取到course-add维护
                 course:'',
             }
         },
         methods: {
             emitCourse () {
+                // 发送自定义事件通知父组件，派发事件通知父组件新增课程
+                // 注意事件名称定义时不要有大写字母出现
                 this.$emit('add-course',this.course);
                 this.course = ''
             }

@@ -20,7 +20,6 @@
         <button @click="addCourse">新增</button>
     </div>
 
-    <!-- 条件渲染 -->
     <p v-if="courses.length == 0">没有课程信息</p>
     <div v-else class="course-list">
         <div v-for="c in courses" :key="c" :style="{'background-color': (selectedCourse === c ? '#ddd' : 'transparent')}"
@@ -58,6 +57,7 @@
 
         },
         async created () {
+            // created 钩子 组件实例已创建，由于未挂载，dom不存在
             const courses = await getCourses();
             this.courses = courses;
         },

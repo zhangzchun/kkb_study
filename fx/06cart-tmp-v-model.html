@@ -16,7 +16,8 @@
     <p>
         <!-- 绑定表达式 -->
         <!-- 课程总数：{{courses.length + '门'}} -->
-        <!-- 计算属性 --> <!-- 课程总数：{{total}} -->
+        <!-- 计算属性 -->
+        <!-- 课程总数：{{total}} -->
         <!-- 监听器 -->
         课程总数：{{totalCount}}
     </p>
@@ -37,11 +38,11 @@
     Vue.component('course-add',{
        props:['value'],
         template:`<div>
-<input type="text" :value="value" @input = 'onInput' @keydown.enter="addCourse" />
-<button @click="addCourse">添加课程</button>
+<input type="text" :value="value" @input = 'onInput' @keydown.enter="emitCourse" />
+<button @click="emitCourse">添加课程</button>
 </div>`,
        methods:{
-           addCourse() {
+           emitCourse() {
                this.$emit('add-course')
            },
            onInput (e) {

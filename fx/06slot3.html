@@ -25,8 +25,9 @@
     <!--<message :show = 'show' @close='show = $event()'>新增课程成功！</message>-->
     <message :show.sync = 'show'>
         <!-- 具名插槽 v-slot -->
-        <template v-slot:title = "slotProps">{{slotProps.title}}</template>
+        <!--<template v-slot:title = "slotProps">{{slotProps.title}}</template>-->
         <!--<template v-slot:default >新增课程成功！</template>-->
+        <template v-slot:title>恭喜</template>
         <template> 新增课程成功！</template>
     </message>
     <h2 :title = "title"> {{title}} </h2>
@@ -60,7 +61,7 @@
     Vue.component('message',{
        props:['show'] ,
        template:`<div class="message-box" v-if="show">
-<strong><slot name="title" title="来自message的标题"></slot></strong>
+<strong><slot name="title"></slot></strong>
 <slot></slot>
 <span class="message-box-close" @click = "$emit('update:show', false)">X</span>
 </div>`,
