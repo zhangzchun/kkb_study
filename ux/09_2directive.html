@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>slot</title>
+    <title>ux directive</title>
     <style>
         .active {
             background-color: #ddd;
@@ -138,10 +138,10 @@
             }
         },
         mounted(){
-            this.$refs.inp.focus()
+            // this.$refs.inp.focus()
         },
         template:  `<div>
-                        <input :value="value" @input="onInput" @keydown.enter="addCourse" ref="inp" v-focus />
+                        <input :value="value" @input="onInput" @keydown.enter="addCourse" v-focus />
                         <button v-on:click="addCourse">新增课程</button>
                     </div> `,
 

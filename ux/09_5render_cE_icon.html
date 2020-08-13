@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>slot</title>
+    <title>render ce icon</title>
     <style>
         .active {
             background-color: #ddd;
@@ -44,7 +44,7 @@
     <!-- <h2> -->
     <!-- 特性、属性值绑定使用v-bind指令 -->
     <!-- 使用render方法实现heading组件 -->
-    <heading level="1" :title="title" icon="gouwuche">
+    <heading :level="'1'" :title="title" icon="gouwuche">
         {{title}}
     </heading>
     <h2 v-bind:title="title">
