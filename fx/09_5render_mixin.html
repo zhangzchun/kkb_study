@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>fx render creatElement</title>
+    <title>fx render mixin</title>
     <style>
         .active {
             background-color: #ddd;
@@ -102,24 +102,38 @@
         }
     });
 
+    // 定义一个混入对象
+    var myMixin = {
+        created: function () {
+            // this 表示组件实例
+            this.hello()
+        },
+        methods:{
+            hello:function () {
+                console.log('hello from mixin!');
+            }
+        }
+    };
+
     Vue.component('message', {
         data() {
             return {
                 show: false,
             }
         },
+        mixins:[myMixin],
         template: `<div class="message-box" v-if="show">
 <strong><slot name="title"></slot></strong>
 <slot></slot>
 <span class="message-box-close" @click = "$emit('update:show', false)">X</span>
 </div>`,
-        mounted() {
+        mounted () {
             this.$bus.$on(`message-close`, () => {
                 this.$emit('update:show', false);
             })
         },
         methods: {
-            toggle() {
+            toggle () {
                 this.show = !this.show;
             }
         },
@@ -180,7 +194,7 @@
             }
         },
         template: `<div>
-<p v-if="courses.length == 0">没有课程信息</p>
+<p v-if="courses.length == 0"> 没有课程信息 </p>
 <div v-else class="course-list">
 <div v-for="c in courses" :key="c.name" :style="{'background-color': (selectedCourse === c ? '#ddd' : 'transparent')}" @click="selectedCourse = c">
 {{ c.name }} -- {{ c.price | currency('$') }}

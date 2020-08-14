@@ -27,7 +27,16 @@
             background: #f66;
             border: 1px solid #d63200;
         }
+
+        .icon {
+            width: 1em;
+            height: 1em;
+            vertical-align: -0.15em;
+            fill: currentColor;
+            overflow: hidden;
+        }
     </style>
+    <script src="https://at.alicdn.com/t/font_1281272_fepjp89tyz9.js"></script>
 </head>
 <body>
 
@@ -93,9 +102,26 @@
             }
         },
         render(h) {
+            // 子节点数组
+            let children = [];
+
+            // icon属性处理逻辑
+            if (this.icon) {
+                // <svg class="icon"><use xlink:href="#icon-cart"/></svg>
+                children.push(h(
+                    'svg',
+                    { class: 'icon' },
+                    [h('use', { attrs: { 'xlink:href': '#icon-' + this.icon } })]
+                ))
+            }
+
+            children = children.concat(this.$slots.default);
+
             const vnode = h(
                 'h' + this.level, // 参数1：tagname
-                this.$slots.default // 参数3：子节点VNode数组
+                { attrs: { title: this.title } }, // 参数2：{。。。}
+                // this.$slots.default // 参数3：子节点VNode数组
+                children
             )
             console.log(vnode);
             return vnode
