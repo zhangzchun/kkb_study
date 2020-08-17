@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>fx render creatElement</title>
+    <style>
+        .active {
+            background-color: #ddd;
+        }
+
+        .message-box {
+            padding: 10px 20px;
+            background: #4fc08d;
+            border: 1px solid #42b983;
+        }
+
+        .message-box-close {
+            float: right;
+        }
+
+        .success {
+            background: #4fc08d;
+            border: 1px solid #42b983;
+        }
+
+        .warning {
+            background: #f66;
+            border: 1px solid #d63200;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <message ref="msgSuccess" class="success">
+        <template v-slot:title>恭喜</template>
+        <template> 新增课程成功！</template>
+    </message>
+    <message ref="msgWarning" class="warning">
+        <template v-slot:title>警告</template>
+        <template> 请输入要添加课程！</template>
+    </message>
+
+    <heading :level="'3'">{{title}}</heading>
+    <h2 :title="title"> {{title}} </h2>
+
+    <course-add v-model="course" @add-course="addCourse"></course-add>
+
+    <p>
+        <input type="text" v-model.number="price">
+        <button @click="batchUpdate">批量更新价格</button>
+    </p>
+    <course-list :courses="courses"></course-list>
+
+    <div class="toolbar" v-permission="'admin'">
+        <button @click="$bus.$emit('message-close')"> 清空提示</button>
+    </div>
+
+    <p>
+        <!-- 绑定表达式 -->
+        <!-- 课程总数：{{courses.length + '门'}} -->
+        <!-- 计算属性 -->
+        <!-- 课程总数：{{total}} -->
+        <!-- 监听器 -->
+        课程总数：{{ totalCount }}
+    </p>
+
+</div>
+
+<script src="vue.js"></script>
+<script>
+
+    function getCourses() {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                // resolve(['web全栈', 'web高级'])
+                resolve([{name: 'web全栈'}, {name: 'web高级'}])
+            }, 2000);
+        })
+    }
+
+    Vue.prototype.$bus = new Vue();
+
+    Vue.component('heading', {
+        props: {
+            level:{
+                type: String,
+                required: true
+            }
+        },
+        render(h) {
+            const vnode = h(
+                'h' + this.level, // 参数1：tagname
+
+                this.$slots.default // 参数3：子节点VNode数组
+            )
+            console.log(vnode);
+            return vnode
+        }
+    });
+
+    Vue.component('message', {
+        data() {
+            return {
+                show: false,
+            }
+        },
+        template: `<div class="message-box" v-if="show">
+<strong><slot name="title"></slot></strong>
+<slot></slot>
+<span class="message-box-close" @click = "$emit('update:show', false)">X</span>
+</div>`,
+        mounted() {
+            this.$bus.$on(`message-close`, () => {
+                this.$emit('update:show', false);
+            })
+        },
+        methods: {
+            toggle() {
+                this.show = !this.show;
+            }
+        },
+    });
+
+    Vue.component('course-add', {
+        props: ['value'],
+        mounted() {
+        },
+        template: `<div>
+<input type="text" :value="value" @input = 'onInput' @keydown.enter="addCourse" v-focus/>
+<button @click="addCourse">添加课程</button>
+</div>`,
+        methods: {
+            addCourse() {
+                this.$emit('add-course')
+            },
+            onInput(e) {
+                this.$emit('input', e.target.value);
+            }
+        }
+    });
+
+
+    // 实现自定义指令
+    Vue.directive('focus', {
+        inserted(el, binding) {
+            el.focus();
+        }
+    })
+
+    // 模拟用户角色
+    const role = 'user';
+    // 注释报错
+
+    Vue.directive('permission', {
+        inserted(el, binding) {
+            // 输出 binding
+            console.log(binding);
+            // 若指定用户角色和当前用户角色不匹配则删除当前指令绑定的元素
+            if (role !== binding.value) {
+                el.parentElement.removeChild(el)
+            }
+        }
+    })
+
+
+    Vue.component('course-list', {
+        data() {
+            return {
+                selectedCourse: ''
+            }
+        },
+        props: {
+            courses: {
+                type: Array,
+                default: []
+            }
+        },
+        template: `<div>
+<p v-if="courses.length == 0">没有课程信息</p>
+<div v-else class="course-list">
+<div v-for="c in courses" :key="c.name" :style="{'background-color': (selectedCourse === c ? '#ddd' : 'transparent')}" @click="selectedCourse = c">
+{{ c.name }} -- {{ c.price | currency('$') }}
+</div>
+</div>
+</div>`,
+        // 筛选 过滤
+        filters: {
+            currency(value, symbol = '￥') {
+                return symbol + value
+            }
+        }
+    });
+
+    const app = new Vue({
+        el: '#app',
+        data() {
+            return {
+                title: '购物车',
+                course: '',
+                courses: [],
+                totalCount: 0,
+                price: 0
+            }
+        },
+        async created() {
+            const courses = await getCourses();
+            this.courses = courses;
+
+            this.batchUpdate();
+        },
+        methods: {
+            // 回调函数接收事件参数
+            /*addCourse(course) {
+                this.courses.push(course);
+            }*/
+            addCourse() {// 还原addCourse
+                if (this.course) {
+                    this.courses.push({name: this.course});
+                    this.course = '';
+                    this.$refs.msgSuccess.toggle()
+                } else {
+                    this.$refs.msgWarning.toggle()
+                }
+            },
+            // 批量显示价格
+            batchUpdate() {
+                this.courses.forEach(c => {
+                    this.$set(c, 'price', this.price)
+
+                });
+            }
+        },
+        computed: {
+            total() {
+                return this.courses.length + '门';
+            }
+        },
+        watch: {
+            courses: {
+                immediate: true,
+                // deep: true,
+                handler(newValue, oldValue) {
+                    this.totalCount = newValue.length + '门';
+                }
+            },
+        }
+    })
+</script>
+</body>
+</html>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>fx temp slot</title>
+    <title>fx ref</title>
     <style>
         .active {
             background-color: #ddd;
@@ -17,30 +17,50 @@
         .message-box-close {
             float: right;
         }
+
+        .success {
+            background: #4fc08d;
+            border: 1px solid #42b983;
+        }
+
+        .warning {
+            background: #f66;
+            border: 1px solid #d63200;
+        }
     </style>
 </head>
 <body>
 
 <div id="app">
-    <!--<message :show = 'show' @close='show = $event()'>新增课程成功！</message>-->
-    <message :show.sync = 'show'>
-        <!-- 具名插槽 v-slot -->
-        <template v-slot:title = "slotProps">{{slotProps.title}}</template>
-        <!--<template v-slot:default> 新增课程成功！</template>-->
+    <message :show.sync = 'show' class="success">
+        <template v-slot:title>恭喜</template>
         <template> 新增课程成功！</template>
+    </message>
+    <message :show.sync = 'showWarn' class="warning">
+        <template v-slot:title>警告</template>
+        <template> 请输入要添加课程！</template>
     </message>
     <h2 :title = "title"> {{title}} </h2>
 
     <course-add v-model="course" @add-course="addCourse"></course-add>
-    <!-- 条件渲染 -->
+
+    <p>
+        <input type="text" v-model.number="price">
+        <button @click="batchUpdate">批量更新价格</button>
+    </p>
     <course-list :courses="courses"></course-list>
+
+    <div class="toolbar">
+        <button @click = "$bus.$emit('message-close')"> 清空提示 </button>
+    </div>
 
     <p>
         <!-- 绑定表达式 -->
         <!-- 课程总数：{{courses.length + '门'}} -->
-        <!-- 计算属性 --> <!-- 课程总数：{{total}} -->
+        <!-- 计算属性 -->
+        <!-- 课程总数：{{total}} -->
         <!-- 监听器 -->
-        课程总数：{{totalCount}}
+        课程总数：{{ totalCount }}
     </p>
 
 
@@ -52,24 +72,36 @@
     function getCourses() {
         return new Promise(resolve => {
             setTimeout(() => {
-                resolve(['web全栈', 'web高级'])
+                // resolve(['web全栈', 'web高级'])
+                resolve([{ name: 'web全栈' }, { name: 'web高级' }])
             }, 2000);
         })
     }
+    Vue.prototype.$bus = new Vue();
 
     Vue.component('message',{
        props:['show'] ,
        template:`<div class="message-box" v-if="show">
-<strong><slot name="title" title="来自message的标题"></slot></strong>
+<strong><slot name="title"></slot></strong>
 <slot></slot>
 <span class="message-box-close" @click = "$emit('update:show', false)">X</span>
 </div>`,
+        mounted () {
+           this.$bus.$on(`message-close`,() => {
+               this.$emit('update:show', false);
+           })
+        }
     });
 
     Vue.component('course-add',{
        props:['value'],
+        mounted(){
+           // mounted之后才能访问到inp
+            // $refs
+            this.$refs.inp.focus()
+       },
         template:`<div>
-<input type="text" :value="value" @input = 'onInput' @keydown.enter="addCourse" />
+<input type="text" :value="value" @input = 'onInput' @keydown.enter="addCourse" ref="inp"/>
 <button @click="addCourse">添加课程</button>
 </div>`,
        methods:{
@@ -97,8 +129,8 @@
         template:`<div>
 <p v-if="courses.length == 0">没有课程信息</p>
 <div v-else class="course-list">
-<div v-for="c in courses" :key="c" :style="{'background-color': (selectedCourse === c ? '#ddd' : 'transparent')}" @click="selectedCourse = c">
-{{ c }}
+<div v-for="c in courses" :key="c.name" :style="{'background-color': (selectedCourse === c ? '#ddd' : 'transparent')}" @click="selectedCourse = c">
+{{ c.name }} -- ￥ {{c.price}}
 </div>
 </div>
 </div>`
@@ -112,12 +144,16 @@
                 course: '',
                 courses:[],
                 totalCount:0,
-                show:false // 提示框状态
+                show:false, // 提示框状态
+                showWarn:false, // 提示框状态
+                price:0
             }
         },
         async created () {
             const courses = await getCourses();
-            this.courses = courses
+            this.courses = courses;
+
+            this.batchUpdate();
         },
         methods :{
             // 回调函数接收事件参数
@@ -125,10 +161,25 @@
                 this.courses.push(course);
             }*/
             addCourse() {// 还原addCourse
-                this.courses.push(this.course);
-                this.course = '';
+                if (this.course) {
+                    this.courses.push({name:this.course});
+                    this.course = '';
+                    // 提示新增
+                    this.show = true;
+                } else {
+                    this.showWarn = true;
+                }
+            },
+            // 批量显示价格
+            batchUpdate(){
+                this.courses.forEach(c => {
+                    // c.price = 0
+                    // c.price = this.price
+                    // Vue.set(c, 'price', this.price)
+                    // app.$set(c, 'price', this.price)
+                    this.$set(c, 'price', this.price)
 
-                this.show = true;
+                });
             }
         },
         computed :{

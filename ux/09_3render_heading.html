@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>slot</title>
+    <title>render heading</title>
     <style>
         .active {
             background-color: #ddd;
@@ -35,7 +35,7 @@
     <!-- <h2> -->
     <!-- 特性、属性值绑定使用v-bind指令 -->
     <!-- 使用render方法实现heading组件 -->
-    <heading>
+    <heading :level="3">
         {{title}}
     </heading>
     <h2 v-bind:title="title">
@@ -176,7 +176,6 @@
     // v-permission="'admin'"
     Vue.directive('permission', {
         inserted(el, binding) {
-            console.log(binding);
             // 若指定用户角色和当前用户角色不匹配则删除当前指令绑定的元素
             if (role !== binding.value) {
                 el.parentElement.removeChild(el)
